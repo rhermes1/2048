@@ -3,7 +3,7 @@ class Field
   attr_accessor :field
 
   def create_game_field
-    self.field = Array.new(5){ Array.new(5) {"2"}}
+    self.field = Array.new(4){ Array.new(4) {"2"}}
   end
 
   def to_s
