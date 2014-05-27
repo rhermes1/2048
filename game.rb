@@ -29,30 +29,34 @@ class Field
     end
   end
 
-  def compare_fields(check_array,x, y)
-    if check_array[y] == nil
+  def compare_fields(check_array, x, x1, y, y1)
+    puts "Feld #{check_array[x][y]} mit #{check_array[x1][y1]}"
+    if check_array[x1][y1] == nil
       return {1 => "break", 2 => check_array}
-    elsif check_array[y] == " "
+    elsif check_array[x1][y1] == " "
       return {1 => "redo", 2 => check_array}
-    elsif check_array[x] == check_array[y]
-      check_array[x] += check_array[y]
-      check_array[y] = " "
+    elsif check_array[x][y] == check_array[x1][y1]
+      check_array[x][y] += check_array[x1][y1]
+      check_array[x1][y1] = " "
       return {1 => "break", 2 => check_array}
-    elsif check_array[y].integer? && check_array[x] == " "
-      check_array[x], check_array[y] = check_array[y], " "
+    elsif check_array[x1][y1].integer? && check_array[x][y] == " "
+      check_array[x][y], check_array[x1][y1] = check_array[x1][y1], " "
       return {1 => "redo", 2 => check_array}
     end
     return {1 => "break", 2 => check_array}
   end
 
-  def check_neigbour_number(check_array, x, x_dir)
-    z, i = x_dir, 0
-    while i < check_array.length do
-      y = x
+  # fd = first_dimension = x | sd = second_dimension = y
+  def check_neigbour_number(check_array, fd, sd, fd_dir, sd_dir, direction)
+    i = 0
+    while i < self.field_columns.first.length do
+      x, x1 = fd, sd
       while true do
-        y += x_dir
-        break if y < 0
-        wh_nex = compare_fields(check_array, x, y)
+        y, y1 = x+fd_dir, x1+sd_dir
+      puts "Vergleich X:#{x} Y:#{y} X1:#{x1} Y1:#{y1}"
+        break if (x1 < 0) || (y1 < 0) || (x1 > self.field_columns.length) ||
+          (x1 > self.field_columns.length)
+        wh_nex = compare_fields(check_array, x, x1, y, y1)
         if wh_nex[1] == "redo"
           check_array = wh_nex[2]
           redo
@@ -61,35 +65,21 @@ class Field
           break
         end
       end
-      x += x_dir
-      z += x_dir
+      x += direction
+      y += sd_dir
       i += 1
     end
     return check_array
-  end
-
-  def move_direction(start)
-    self.field_columns.each do |row|
-      case start
-        when("left")
-          check_neigbour_number(row, 0, 1)
-        when("right")
-          check_neigbour_number(row, row.length, -1)
-      end
-    end
   end
 
   def choose_direction
   next_step = gets.chomp
     case next_step
       when self.up
-        move_direction("up")
       when self.right
-        move_direction("right")
       when self.down
-        move_direction("up")
       when self.left
-        move_direction("left")
+        check_neigbour_number(self.field_columns, 0, 0, 0, 1, 1)
       else
         output
         choose_direction
